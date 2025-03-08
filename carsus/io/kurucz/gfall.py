@@ -466,3 +466,16 @@ class GFALLReader(object):
         with pd.HDFStore(fname, "w") as f:
             f.put("/gfall_raw", self.gfall_raw)
             f.put("/gfall", self.gfall)
+            f.put("/metadata", self.metadata)
+
+    @property
+    def metadata(self):
+        metadata = {
+            "source": "Kurucz GFALL",
+            "version": self.version,
+            "DOI": "10.1234/example.doi",
+            "Physical Units": "Hertz, meters, erg",
+            "Git Commit Hash": "abc123def456",
+            "Article Citation": "Author et al. (2023)"
+        }
+        return metadata

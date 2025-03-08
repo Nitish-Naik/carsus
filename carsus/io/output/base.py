@@ -8,6 +8,7 @@ from carsus.io.output.ionization_energies import IonizationEnergiesPreparer
 from carsus.io.output.levels_lines import LevelsLinesPreparer
 from carsus.io.output.macro_atom import MacroAtomPreparer
 from carsus.io.output.photo_ionization import PhotoIonizationPreparer
+from carsus.io.output.metadata import Metadata
 
 from carsus.util import (
     hash_pandas_object,
@@ -32,6 +33,7 @@ class TARDISAtomData:
     collisions_prepared: pandas.DataFrame
     macro_atom_prepared : pandas.DataFrame
     macro_atom_references_prepared : pandas.DataFrame
+    metadata : pandas.DataFrame
 
     """
     def __init__(
@@ -95,7 +97,12 @@ class TARDISAtomData:
             self.cross_sections_preparer = PhotoIonizationPreparer(self.levels, self.levels_all, self.lines_all, self.cmfgen_reader,  self.levels_lines_preparer.cmfgen_ions)
         else:
             self.cross_sections_preparer = None
-            
+
+        self.metadata = Metadata()
+        self.metadata.add_entry("DOI", "10.1234/example.doi")
+        self.metadata.add_entry("Physical Units", "Hertz, meters, erg")
+        self.metadata.add_entry("Git Commit Hash", "abc123def456")
+        self.metadata.add_entry("Article Citation", "Author et al. (2023)")
 
         logger.info("Finished.")
     
@@ -186,7 +193,9 @@ class TARDISAtomData:
             "/levels_data": self.levels_prepared,
             "/lines_data": self.lines_prepared,
             "/macro_atom_data": self.macro_atom_prepared,
-            "/macro_atom_references": self.macro_atom_references_prepared}
+            "/macro_atom_references": self.macro_atom_references_prepared,
+            "/metadata": self.metadata.data
+        }
         
         optional_outputs = {
             "/nuclear_decay_rad": (self.nndc_reader, "decay_data"),
